@@ -1,0 +1,17 @@
+#lang racket
+;EJERCICIO 1
+(define (calculadora a b c)
+  (cond
+    [(equal? a "suma") (+ b c)]
+    [(equal? a "resta") (- b c)]
+    [(equal? a "division") (/ b c)]
+    [(equal? a "multiplicacion") (* b c)]
+    [else "Operador no reconocido"]))
+
+(calculadora "suma" 3 5)
+(calculadora "resta" 3 5)
+(calculadora "division" 3 5)
+(calculadora "multiplicacion" 3 5)
+(calculadora "hola" 3 5)
+
+;EJERCICIO 2

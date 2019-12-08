@@ -1,0 +1,60 @@
+#lang racket
+
+(define listaNueva '() )
+;;listaAbiertos simula que ya tenemos varios nodos en la lista para comprobar que funciona
+(define listaAbiertos '((2 5 8) (3 4 5) (2 1 3)))
+                                   
+
+#|===============================================================
+   Func: introducirAnchura : list number number number number -> list
+   Obj: Devuelve la lista de abiertos incluyendo una nueva lista dentro de esta con la información del nuevo nodo en la ultima posicion de la lista
+ Detalles: flag sirve para indicar recursivamente si se ha introducido los valores en la lista.
+  ===============================================================|#
+(define (introducirAnchura lista coord1 coord2 valor flag)
+  (cond
+    [(= flag 0) (introducirAnchura (append lista (list (crearNodo '() coord1 coord2 valor))) coord1 coord2 valor (+ flag 1))]
+    [(= flag 1) lista]))
+
+#|===============================================================
+   Func: introducirProfundidad : list number number number number -> list
+   Obj: Devuelve la lista de abiertos incluyendo una nueva lista dentro de esta con la información del nuevo nodo en la primera posicion de la lista
+ Detalles: flag sirve para indicar recursivamente si se ha introducido los valores en la lista.
+  ===============================================================|#
+(define (introducirProfundidad lista coord1 coord2 valor flag)
+  (cond
+    [(= flag 0) (introducirAnchura (reverse (append (reverse lista) (list (crearNodo '() coord1 coord2 valor)))) coord1 coord2 valor (+ flag 1))]
+    [(= flag 1) lista]))
+
+
+#|===============================================================
+   Func: crearNodo : list number number number -> list
+   Obj: Devuelve una lista con la información del nuevo nodo
+  ===============================================================|#
+(define (crearNodo lista coord1 coord2 valor)
+  (cond 
+        [(= (length lista) 0) (crearNodo (append lista (list coord1)) coord1 coord2 valor)]
+        [(= (length lista) 1) (crearNodo (append lista (list coord2)) coord1 coord2 valor)]
+        [(= (length lista) 2) (crearNodo (append lista (list valor)) coord1 coord2 valor)]
+        [(= (length lista) 3) lista]))
+
+
+#|===============================================================
+   Func: sacar : list -> list 
+   Obj: Devuelve una lista correspondiente al primer nodo de la lista de abiertos
+  ===============================================================|#
+(define (sacar lista)
+  (list-ref lista 0))
+
+#|===============================================================
+   Func: eliminar : list -> list 
+   Obj: Devuelve la lista de nodos abiertos eliminando el primer elemento
+  ===============================================================|#
+(define (eliminar lista)
+  (cdr lista))
+
+(introducirProfundidad listaAbiertos 0 1 5 0)
+(introducirAnchura listaAbiertos 0 1 5 0)
+(sacar listaAbiertos)
+(eliminar listaAbiertos)
+
+

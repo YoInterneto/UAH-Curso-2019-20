@@ -1,0 +1,681 @@
+#lang racket
+
+(require rackunit)
+
+#|**********************************************************
+  ************* SUDOKUS PARA TEST UNITARIOS ****************
+  **********************************************************|#
+
+(define matrizSolucion '((5 6 7 8 3 9 4 2 1)
+                         (9 2 8 4 6 1 5 7 3)
+                         (1 3 4 2 7 5 9 8 6)
+
+                         (4 8 3 6 5 2 1 9 7)
+                         (7 5 6 9 1 3 2 4 8)
+                         (2 1 9 7 4 8 3 6 5)
+
+                         (6 7 5 1 9 4 8 3 2)
+                         (8 4 1 3 2 6 7 5 9)
+                         (3 9 2 5 8 7 6 1 4)))
+
+(define matrizIncorrecta '((5 2 0 0 0 0 0 0 0)
+                           (0 2 8 4 0 0 5 0 3)
+                           (1 0 0 2 7 0 0 0 6)
+
+                           (0 0 3 0 5 2 1 9 0)
+                           (7 0 6 0 1 0 2 0 8)
+                           (0 1 9 7 4 0 3 0 0)
+
+                           (6 0 0 0 9 4 0 0 2)
+                           (8 0 1 0 0 6 7 5 0)
+                           (0 0 0 0 0 0 0 0 4)))
+
+
+#|**********************************************************
+  ***************** SUDOKUS PARA RESOLVER ******************
+  **********************************************************|#
+
+(define test1 '((5 0 0 0 0 0 0 0 0)
+                 (0 2 8 4 0 0 5 0 3)
+                 (1 0 0 2 7 0 0 0 6)
+                 (0 0 3 0 5 2 1 9 0)
+                 (7 0 6 0 1 0 2 0 8)
+                 (0 1 9 7 4 0 3 0 0)
+                 (6 0 0 0 9 4 0 0 2)
+                 (8 0 1 0 0 6 7 5 0)
+                 (0 0 0 0 0 0 0 0 4)))
+
+(define test2 '((5 6 0 0 0 4 1 0 0)
+                 (0 7 0 6 0 0 0 3 0)
+                 (0 0 0 1 2 0 0 6 0)
+                 (0 0 0 3 0 8 6 9 2)
+                 (0 8 0 0 7 0 0 4 0)
+                 (4 3 2 9 0 6 0 0 0)
+                 (0 5 0 0 9 7 0 0 0)
+                 (0 2 0 0 0 1 0 5 0)
+                 (0 0 9 5 0 0 0 8 6)))
+
+(define test3 '((0 0 4 0 3 0 0 6 0)
+                 (1 6 0 0 0 2 0 3 0)
+                 (9 0 2 8 0 6 4 5 0)
+                 (0 0 0 0 6 0 9 1 0)
+                 (0 0 0 0 0 0 0 0 0)
+                 (0 1 8 0 5 0 0 0 0)
+                 (0 2 6 1 0 5 3 0 4)
+                 (0 7 0 6 0 0 0 8 2)
+                 (0 4 0 0 2 0 6 0 0)))
+
+(define test4 '((0 0 0 0 0 4 8 0 0)
+                 (0 2 0 0 0 3 0 1 0)
+                 (6 0 1 0 0 0 7 0 5)
+                 (5 8 0 0 0 9 0 7 0)
+                 (0 0 4 0 0 0 5 0 0)
+                 (0 1 0 7 0 0 0 8 6)
+                 (4 0 3 0 0 0 9 0 2)
+                 (0 6 0 3 0 0 0 4 0)
+                 (0 0 2 6 0 0 0 0 0)))
+
+(define test5 '((9 0 8 0 0 2 0 0 0)
+                 (0 0 0 0 7 0 0 5 8)
+                 (0 7 0 0 0 9 0 0 0)
+                 (0 9 4 0 1 8 5 0 7)
+                 (5 0 0 0 9 0 0 0 1)
+                 (2 0 1 7 6 0 3 9 0)
+                 (0 0 0 5 0 0 0 3 0)
+                 (8 1 0 0 3 0 0 0 0)
+                 (0 0 0 9 0 0 7 0 6)))
+
+(define test6 '((0 1 0 9 4 2 7 0 0)
+                 (0 0 0 6 0 0 2 0 0)
+                 (2 0 0 0 7 1 9 0 0)
+                 (4 8 0 0 0 0 0 0 2)
+                 (7 0 0 0 0 0 0 0 9)
+                 (1 0 0 0 0 0 0 8 6)
+                 (0 0 7 8 2 0 0 0 1)
+                 (0 0 1 0 0 9 0 0 0)
+                 (0 0 8 5 1 6 0 2 0)))
+
+(define test7 '((6 1 0 3 5 4 0 9 0)
+                 (0 9 0 0 0 0 0 0 4)
+                 (8 4 0 0 9 0 6 1 0)
+                 (0 3 0 4 0 0 8 0 0)
+                 (0 0 0 9 6 1 0 0 0)
+                 (0 0 1 0 0 3 0 5 0)
+                 (0 6 4 0 3 0 0 8 2)
+                 (2 0 0 0 0 0 0 3 0)
+                 (0 8 0 5 1 2 0 6 9)))
+
+(define test8 '((5 0 0 3 4 0 0 0 1)
+                 (0 1 4 0 0 6 3 7 0)
+                 (7 0 3 9 0 8 4 0 0)
+                 (2 7 9 0 0 0 0 0 0)
+                 (0 4 0 0 0 0 0 3 0)
+                 (0 0 0 0 0 0 6 1 7)
+                 (0 0 7 2 0 3 8 0 6)
+                 (0 5 6 8 0 0 1 2 0)
+                 (8 0 0 0 6 4 0 0 9)))
+
+(define test9 '((0 0 5 0 0 7 0 6 8)
+                 (0 0 0 0 0 0 0 0 0)
+                 (9 8 0 6 3 0 2 7 0)
+                 (0 0 6 1 0 0 0 2 4)
+                 (0 0 0 0 4 0 0 0 0)
+                 (2 3 0 0 0 8 9 0 0)
+                 (0 5 8 0 1 3 0 9 2)
+                 (0 0 0 0 0 0 0 0 0)
+                 (4 6 0 2 0 0 5 0 0)))
+
+(define test10 '((1 0 0 0 9 6 0 0 0)
+                 (0 9 0 3 5 7 0 6 8)
+                 (0 0 0 0 8 0 7 0 0)
+                 (0 1 0 7 0 0 6 5 0)
+                 (0 0 0 0 0 0 0 0 0)
+                 (0 3 4 0 0 9 0 8 0)
+                 (0 0 1 0 7 0 0 0 0)
+                 (9 8 0 1 6 4 0 7 0)
+                 (0 0 0 5 3 0 0 0 6)))
+
+(define test11 '((0 0 0 2 1 9 0 0 6)
+                 (0 2 7 6 0 0 0 0 5)
+                 (0 0 0 5 0 3 8 0 0)
+                 (1 0 0 0 9 0 0 6 0)
+                 (7 0 0 1 0 8 0 0 3)
+                 (0 9 0 0 4 0 0 0 7)
+                 (0 0 9 8 0 1 0 0 0)
+                 (8 0 0 0 0 6 5 3 0)
+                 (5 0 0 9 3 7 0 0 0)))
+
+
+(define test12 '((3 5 0 2 0 0 8 9 0)
+                 (0 4 0 7 0 8 0 0 0)
+                 (1 0 8 0 3 0 0 0 0)
+                 (4 0 5 0 7 2 0 1 0)
+                 (0 0 6 8 0 1 9 0 0)
+                 (0 9 0 3 5 0 2 0 7)
+                 (0 0 0 0 2 0 3 0 5)
+                 (0 0 0 6 0 5 0 2 0)
+                 (0 1 2 0 0 3 0 6 9)))
+
+(define test13 '((1 6 0 9 3 0 0 8 0)
+                 (0 0 0 1 0 0 0 0 9)
+                 (0 0 0 8 5 0 1 3 0)
+                 (9 0 5 0 1 0 6 4 2)
+                 (0 0 0 0 0 0 0 0 0)
+                 (4 8 2 0 6 0 5 0 1)
+                 (0 4 3 0 8 2 0 0 0)
+                 (5 0 0 0 0 3 0 0 0)
+                 (0 2 0 0 9 1 0 5 6)))
+
+(define test14 '((0 0 0 0 6 3 0 5 4)
+                 (1 0 5 7 0 0 0 2 3)
+                 (0 6 7 0 0 2 0 0 0)
+                 (0 0 0 0 4 0 3 8 6)
+                 (8 0 0 5 0 6 0 0 1)
+                 (4 1 6 0 9 0 0 0 0)
+                 (0 0 0 8 0 0 1 6 0)
+                 (6 3 0 0 0 7 8 0 5)
+                 (7 8 0 6 1 0 0 0 0)))
+
+(define test15 '((0 5 4 6 2 0 0 0 0)
+                 (6 0 7 0 0 8 0 3 1)
+                 (8 0 0 0 0 5 2 0 4)
+                 (0 0 0 9 0 1 0 7 0)
+                 (7 0 0 5 0 4 0 0 6)
+                 (0 9 0 7 0 2 0 0 0)
+                 (3 0 1 8 0 0 0 0 2)
+                 (2 8 0 3 0 0 4 0 9)
+                 (0 0 0 0 1 6 3 8 0)))
+
+(define test16 '((9 7 0 0 0 3 4 5 0)
+                 (1 0 0 0 2 4 0 3 0)
+                 (4 3 0 0 0 9 2 0 6)
+                 (7 0 4 8 0 0 0 0 0)
+                 (0 9 0 0 0 0 0 8 0)
+                 (0 0 0 0 0 2 7 0 5)
+                 (2 0 7 9 0 0 0 6 8)
+                 (0 4 0 3 6 0 0 0 7)
+                 (0 5 3 2 0 0 0 9 4)))
+
+(define test17 '((3 0 8 0 0 0 0 0 0)
+                 (0 0 0 0 4 0 5 0 7)
+                 (6 7 0 0 5 8 0 1 9)
+                 (1 8 0 0 0 0 0 0 0)
+                 (7 9 0 8 2 3 0 4 5)
+                 (0 0 0 0 0 0 0 9 3)
+                 (4 6 0 7 8 0 0 3 1)
+                 (2 0 9 0 1 0 0 0 0)
+                 (0 0 0 0 0 0 4 0 6)))
+
+(define test18 '((0 7 6 0 0 3 0 0 0)
+                 (0 0 0 8 0 0 6 0 0)
+                 (3 0 0 0 5 0 0 2 4)
+                 (7 8 3 5 0 0 0 9 0)
+                 (1 2 9 6 0 8 7 4 5)
+                 (0 4 0 0 0 7 8 1 3)
+                 (8 5 0 0 6 0 0 0 2)
+                 (0 0 7 0 0 1 0 0 0)
+                 (0 0 0 4 0 0 3 8 0)))
+
+(define test19 '((0 0 0 0 0 8 0 0 0)
+                 (3 0 8 0 0 0 7 0 0)
+                 (2 9 4 7 0 0 0 8 1)
+                 (4 0 0 8 6 0 0 7 0)
+                 (0 0 0 0 0 0 0 0 0)
+                 (0 7 0 0 9 2 0 0 6)
+                 (6 5 0 0 0 1 2 4 3)
+                 (0 0 3 0 0 0 8 0 9)
+                 (0 0 0 5 0 0 0 0 0)))
+
+(define test20 '((8 0 0 4 6 0 0 0 0)
+                 (0 0 0 0 1 0 0 0 9)
+                 (0 7 0 3 0 8 6 0 0)
+                 (2 0 0 0 0 0 0 9 0)
+                 (3 8 0 0 7 0 0 2 1)
+                 (0 5 0 0 0 0 0 0 8)
+                 (0 0 4 5 0 6 0 1 0)
+                 (5 0 0 4 0 0 0 0 0)
+                 (0 0 0 0 9 3 0 0 6)))
+
+
+
+(define listaAbiertos '())
+
+
+
+#|******************************************************************************
+  ***********************   METODOS COMPROBACION SUDOKU   **********************
+  ******************************************************************************|#
+
+#|=====================================================================
+   Func: estaFila : list number number number -> boolean
+   Obj: Devuelve #t cuando el numero esta en la fila y
+        #f cuando no lo esta
+  =====================================================================|#
+(define (estaFila sudoku fila columna numero)
+  (for/or ([c 9])
+    (if (= c columna) ;si es la misma posicion no la compara
+        #f
+        (equal? (list-ref (list-ref sudoku fila) c) numero) ;compara la posicion para las demas posiciones
+    )
+  )
+)
+
+
+#|=====================================================================
+   Func: estaColumna : list number number number -> boolean
+   Obj: Devuelve #t cuando el numero esta en la columna y
+        #f cuando no lo esta
+  =====================================================================|#
+(define (estaColumna sudoku columna fila numero)
+  (for/or ([f 9])
+    (if (= f fila) ; si es la misma posicion no la compara
+        #f
+        (equal? (list-ref (list-ref sudoku f) columna) numero) ;compara la posicion para las demas posiciones
+    )
+  )
+)
+
+
+#|===========================================================================
+   Func: estaCuadrado list number number number number number -> boolean
+   Obj: Devuelve #t cuando el numero esta en el cuadrado y
+        #f cuando no lo esta
+   Detalles: inicio y final son los valores que se iteran para recorrer el
+             cuadrado, por otro lado fila y columna son los valores donde se
+             encuentra el numero que se quiere comprobar y por tanto lo salta
+  ===========================================================================|#
+(define (estaCuadrado sudoku inicio final fila columna numero)
+  (for*/or ([f (in-range inicio (+ 3 inicio))][c (in-range final (+ 3 final))])
+    (if (and (= f fila) (= c columna)) ; si es la misma posicion no la compara
+        #f
+        (equal? (list-ref (list-ref sudoku f) c) numero) ;compara la posicion para las demas posiciones
+    ) 
+  )
+)
+
+
+#|===============================================================
+   Func: estaPermitido : list number number number -> boolean
+   Obj: Devulve #t si el numero puede ponerse en esa posicion
+        y #f si no puede
+  ===============================================================|#
+(define (estaPermitido sudoku fila columna numero)
+  (if (or (estaCuadrado sudoku (- fila (remainder fila 3)) (- columna (remainder columna 3)) fila columna numero) ;aqui iria el que ve si esta en el mismo cuadro
+          (estaFila sudoku fila columna numero)
+          (estaColumna sudoku columna fila numero)
+      )
+      #f #t)
+)
+
+
+#|===============================================================
+   Func: sudokuInicioCorrecto? : list -> boolean
+   Obj: Devulve #t si el sudoku es correcto y #f si no lo es sin contar las posiciones
+        del sudoku con un 0 (comprueba al inicio del sudoku)
+  ===============================================================|#
+(define (sudokuInicioCorrecto? sudoku)
+  (for*/and ([f 9][c 9])
+    (cond
+      ;si no es 0 mira si el numero esta repetido en su fila, columna o cuadrado
+      [(not (equal? (list-ref (list-ref sudoku f) c) 0))
+       (estaPermitido sudoku f c (list-ref (list-ref sudoku f) c))]
+      ;si el numero es 0 pues directamente sera #t
+      [else #t]
+    )
+  )
+)
+
+
+#|===============================================================
+   Func: sudokuFinalCorrecto? : list -> boolean
+   Obj: Devuelve #t si el sudoku es correcto y #f, teniendo en cuenta que
+        no puede haber ninguna posicion con 0 (comprueba al final de sudoku)
+  ===============================================================|#
+(define (sudokuFinalCorrecto? sudoku)
+  (for*/and ([f 9][c 9])
+    (cond
+      ;si el numero es igual a 0 no estará completo con lo cual #f
+      [(equal? (list-ref (list-ref sudoku f) c) 0) #f]
+      ;si no es 0 comprueba que el numero en esa posicion sea correcta
+      [else (estaPermitido sudoku f c (list-ref (list-ref sudoku f) c))]
+    )
+  )
+)
+
+
+
+#|******************************************************************************
+  *****************   METODOS QUE MANEJAN LISTA DE ABIERTOS   ******************
+  ******************************************************************************|#
+
+#|===============================================================
+   Func: sucesores : list list number number list number string -> procedure
+   Obj: Comprueba que sucesores puede haber en funcion de los posible valores
+        permitidos en una posicion del sudoku, llamando finalmente a una funcion
+        para insertar los valores en la lista de abiertos
+   Detalles: contador es una varaible que toma valores entre 1-9 que son los
+             posibles valores que puede haber en un sudoku
+  ===============================================================|#
+(define (sucesores listaAbiertos listaSucesores fila columna sudoku contador busqueda)
+  (cond
+    ;si ha probado todos los numero posibles llama a la funcion que introduce en anchura
+    [(equal? contador 10)
+     (cond
+       [(equal? busqueda "profundidad") (abiertosProfundidad listaAbiertos listaSucesores fila columna sudoku)]
+       [(equal? busqueda "anchura") (abiertosAnchura listaAbiertos listaSucesores fila columna sudoku)]
+       [else "No se ha reconocido la busqueda"]
+     )
+    ]
+    ;si no mira si esta permitido y si lo esta los mete en la lista de sucesores
+    [else
+     (if (estaPermitido sudoku fila columna contador)
+         (sucesores listaAbiertos (append listaSucesores (list contador)) fila columna sudoku (add1 contador) busqueda)
+         (sucesores listaAbiertos listaSucesores fila columna sudoku (add1 contador) busqueda)
+     )]
+  )
+)
+
+
+#|===============================================================
+   Func: abiertosAnchura : lista lista number number list -> list
+   Obj: Devuelve una lista de abierto en anchura con la información de los nodos
+        abiertos (fila, columna, sudoku actual)
+  ===============================================================|#
+(define (abiertosAnchura abiertos sucesores fila columna sudoku)
+  (cond
+    ;si ya se han introducido todos los sucesores en abiertos pasa devuelve la lista
+    [(null? sucesores)
+     abiertos]
+    ;si no llama a la funcion habiendo introducido en la lista el sudoku con el valor de sucesores añadido
+    ;y sigue insertando los demas valores en la lista
+    [else
+     (abiertosAnchura (append abiertos (list (crearNodo '() fila columna (insertar sudoku '() fila columna (car sucesores) 0)))) (cdr sucesores) fila columna sudoku)]
+  )
+)
+
+
+#|===============================================================
+   Func: anchura : lista lista number number list -> list
+   Obj: Devuelve una lista de abierto en anchura con la información de los nodos
+        abiertos (fila, columna, sudoku actual)
+  ===============================================================|#
+(define (abiertosProfundidad abiertos sucesores fila columna sudoku)
+  (cond
+    ;si ya se han introducido todos los sucesores devuelve la lista
+    [(null? sucesores)
+     abiertos]
+    ;si quedan valores por introducir instroducimos los valor en una pila tipo LIFO
+    [else
+     (let ((reverseSucesores (reverse sucesores)))
+       (abiertosProfundidad (append (list (crearNodo '() fila columna (insertar sudoku '() fila columna (car reverseSucesores) 0))) abiertos) (reverse (cdr reverseSucesores)) fila columna sudoku))]
+     ;creamos una variable que es la lista de sucesores dada la vuelta y llamamos a la funcion con la lista de abiertos
+     ;la lista de sucesores ( 1 2 3 ) ( 7 8 ) pues seria (3 2 1) + car(8 7) que es (3 2 1) + (8) (3 2 1 8), finalmente haciendo reverse (8 3 2 1)
+     ;quedando la lista de abiertos asi (7 8 1 2 3)
+  )
+)
+
+
+#|===============================================================
+   Func: crearNodo : list number number number -> list
+   Obj: Devuelve una lista con la información del nuevo nodo, introduciendo de uno en uno
+        y de forma recusiva los valores (fila, columna, valor)
+  ===============================================================|#
+(define (crearNodo lista coord1 coord2 sudoku)
+  (cond
+        [(= (length lista) 0) (crearNodo (append lista (list coord1)) coord1 coord2 sudoku)]
+        [(= (length lista) 1) (crearNodo (append lista (list coord2)) coord1 coord2 sudoku)]
+        [(= (length lista) 2) (crearNodo (append lista (list sudoku)) coord1 coord2 sudoku)]
+        [(= (length lista) 3) lista]))
+
+
+#|===============================================================
+   Func: sacar : list -> list 
+   Obj: Devuelve una lista correspondiente al primer nodo de la lista de abiertos
+  ===============================================================|#
+(define (sacar lista)
+  (list-ref lista 0))
+
+
+#|===============================================================
+   Func: eliminar : list -> list 
+   Obj: Devuelve la lista de nodos abiertos eliminando el primer elemento
+  ===============================================================|#
+(define (eliminar lista)
+  (cdr lista))
+
+
+
+#|******************************************************************************
+  *********************   METODOS QUE MANEJAN EL SUDOKU   **********************
+  ******************************************************************************|#
+
+#|===============================================================
+   Func: insertar : list list number number number -> list
+   Obj: Devuelve la lista del sudoku después de insertar el nodo
+  ===============================================================|#
+(define (insertar lista lista2 fila columna numero contador)
+  (cond [(= contador 9) lista2]
+        ;si esta en la posicion que se quiere cambiar se cambia
+        [(= fila contador) (insertar lista (append lista2 (list (introducirNumero (list-ref lista contador) '() columna numero))) fila columna numero (+ contador 1))]
+        ;si no esta en la posicion que se quiere cambiar no hace nada
+        [else (insertar lista (append lista2 (list (list-ref lista contador))) fila columna numero (+ contador 1))]))
+
+
+#|===============================================================
+   Func: crearNodo : list list number number -> list
+   Obj: Devuelve una lista con el elemento cambiado en la posicion indicada
+  ===============================================================|#
+(define (introducirNumero lista lista2 posicion numero)
+    (cond [(= (length lista) 0) lista2]
+          [(= posicion 0) (introducirNumero (cdr lista) (append lista2 (list numero)) (- posicion 1) numero)]
+          [else (introducirNumero (cdr lista) (append lista2 (list (car lista))) (- posicion 1) numero)]))
+
+
+
+
+#|******************************************************************************
+  *********************   METODOS RESOLUCION DE SUDOKU   ***********************
+  ******************************************************************************|#
+
+#|===============================================================
+   Func: resolverSudoku : list number number list string -> procedure
+   Obj: Si el sudoku se puede resolver llama al metodo que resulve el
+        sudoku si no se puede resolver printea que no se puede
+  ===============================================================|#
+(define (resolverSudoku sudoku busqueda)
+  (cond
+    [(sudokuInicioCorrecto? sudoku) (solucionSudoku sudoku 0 0 listaAbiertos busqueda 0)]
+    [else (printf "No se puede resolver mediante búsqueda en ~a" busqueda) (newline)]
+  )
+)
+
+
+#|===============================================================
+   Func: solucionSudoku : list number number list string number-> procedure (printSudoku)
+   Obj: Metodo donde se desarrolla la logica para la resolucion del sudoku
+   Detalles: iteraciones cuenta el numero de veces que se visita un nodo del arbol
+  ===============================================================|#
+(define (solucionSudoku sudoku filaC columnaC listaAbiertos busqueda iteraciones)
+  (cond
+    ;si el sudoku es correcto lo printea
+    [(sudokuFinalCorrecto? sudoku)
+     (printf "\n* * * * * *SOLUCION* * * * * *")
+     (printSudoku sudoku)
+     (printf "Nº iteraciones: ~a \n" iteraciones)
+     (printf "* * * * * * * * * * * * * * * *\n")
+    ]
+    ;comprueba si el sudoku ha sido totalmente comprobado
+    [(equal? filaC 9)
+     (cond
+       ;no es completo y no hay abiertos
+       [(null? listaAbiertos)
+        (printf "No se puede seguir")]
+       ;si no es completo pero no esta vacia la lista de abiertos se sigue comprobando
+       [else
+        (let ((abiertos (sucesores listaAbiertos '() filaC columnaC sudoku 1 busqueda)))
+              (printSudoku sudoku)
+              (solucionSudoku (list-ref (sacar abiertos) 2) (list-ref (sacar abiertos) 0) (add1 (list-ref (sacar abiertos) 1)) (eliminar abiertos) busqueda (add1 iteraciones))
+        )
+      ]
+     )
+    ]
+    ;comprueba si ha llegado al final de una linea y va a la siguiente fila
+    [(equal? columnaC 9)
+     (solucionSudoku sudoku (add1 filaC) (- columnaC 9) listaAbiertos busqueda iteraciones)]
+    ;si es cualquier otra posición que no sea final de fila o final de sudoku
+    [else
+     (if (equal? (list-ref (list-ref sudoku filaC) columnaC) 0)
+            ;si es 0 "guardamos" en una variable la nueva lista de abiertos y llamamos a la funcion con la fila, columna y sudoku
+            ;del primer nodo de la lista de abiertos
+            (let ((abiertos (sucesores listaAbiertos '() filaC columnaC sudoku 1 busqueda)))
+              (printSudoku (list-ref (sacar abiertos) 2))
+              (solucionSudoku (list-ref (sacar abiertos) 2) (list-ref (sacar abiertos) 0) (add1 (list-ref (sacar abiertos) 1)) (eliminar abiertos) busqueda (add1 iteraciones))
+            )
+            ;si no es 0 seguimos iterado el sudoku
+            (solucionSudoku sudoku filaC (add1 columnaC) listaAbiertos busqueda iteraciones)
+      )
+    ]
+  )
+)
+
+
+#|===============================================================
+   Func: printSudoku : list number number list -> 
+   Obj: Método que muestra por pantalla, con un formato adecuado el sudoku que se pase
+        como parámetro
+  ===============================================================|#
+(define (printSudoku sudoku)
+  (newline)
+  (for ([i 9])
+    (cond
+      ;si la siguiente fila a printear es el principio de una celda
+      ;printeamos la separacion
+      [(equal? (remainder i 3) 0)
+       (printf "+---------+---------+---------+\n")]
+    )
+    (for ([j 9])
+      (cond
+        ;si la siguiente posicion es el principio de una celda
+        ;printeamos la separacion interna
+        [(equal? (remainder j 3) 0)
+         (printf "|")]
+      )
+
+      (printf " ~a " (list-ref (list-ref sudoku i) j))
+    )
+
+    (printf "|\n")
+  )
+  (printf "+---------+---------+---------+\n")
+)
+
+
+;****************** TEST UNITARIOS **********************
+(printf "Prueba función estaFila\n")
+
+(check-equal? (estaFila test1 1 1 3) #t) ;válido
+(check-equal? (estaFila test1 1 1 6) #t) ;inválido, el 6 no está en fila 1
+
+(printf "Prueba función estaColumna\n")
+
+(check-equal? (estaColumna test1 1 1 1) #t) ;válido
+(check-equal? (estaColumna test1 1 1 7) #t) ;invákido, el 7 no está en columna 1
+
+(printf "Prueba función estaCuadrado\n")
+
+(check-equal? (estaCuadrado test1 0 0 4 5 5) #t) ;válido
+(check-equal? (estaCuadrado test1 0 0 4 5 6) #t) ;inválido, el 6 no está en el cuadrado
+
+(printf "Prueba función estaPermitido\n")
+
+(check-equal? (estaPermitido test1 0 0 3) #t) ;válido
+(check-equal? (estaPermitido test1 0 0 8) #t) ;inválido, el 7 no se puede poner en esa posición
+
+(printf "Prueba función sudokuInicioCorrecto?\n")
+
+(check-equal? (sudokuInicioCorrecto? test1) #t) ;válido
+(check-equal? (sudokuInicioCorrecto? matrizIncorrecta) #t) ;inválido
+
+(printf "Prueba función sudokuFinalCorrecto?\n")
+
+(check-equal? (sudokuFinalCorrecto? matrizSolucion) #t) ;válido
+(check-equal? (sudokuFinalCorrecto? test1) #t) ;inválido
+
+(printf "Prueba función crearNodo\n")
+
+(check-equal? (crearNodo '() 1 2 3) '(1 2 3)) ;válido
+(check-equal? (crearNodo '() 1 2 3) '(1 4 7)) ;inválido
+
+(printf "Prueba función sacar\n")
+
+(check-equal? (sacar '(1 2 3 4)) 1) ;válido
+(check-equal? (sacar '(1 2 3 4)) 4) ;inválido
+
+(printf "Prueba función eliminar\n")
+
+(check-equal? (eliminar '(1 2 3 4)) '(2 3 4)) ;válido
+(check-equal? (eliminar '(1 2 3 4)) '(4)) ;inválido
+
+
+;****************** EJECUCION DEL PROGRAMA *********************
+
+(resolverSudoku test1 "anchura")
+(resolverSudoku test1 "profundidad")
+
+(resolverSudoku test2 "anchura")
+(resolverSudoku test2 "profundidad")
+
+(resolverSudoku test3 "anchura")
+(resolverSudoku test3 "profundidad")
+
+(resolverSudoku test4 "anchura")
+(resolverSudoku test4 "profundidad")
+
+(resolverSudoku test5 "anchura")
+(resolverSudoku test5 "profundidad")
+
+(resolverSudoku test6 "anchura")
+(resolverSudoku test6 "profundidad")
+
+(resolverSudoku test7 "anchura")
+(resolverSudoku test7 "profundidad")
+
+(resolverSudoku test8 "anchura")
+(resolverSudoku test8 "profundidad")
+
+(resolverSudoku test9 "anchura")
+(resolverSudoku test9 "profundidad")
+
+(resolverSudoku test10 "anchura")
+(resolverSudoku test10 "profundidad")
+
+(resolverSudoku test11 "anchura")
+(resolverSudoku test11 "profundidad")
+
+(resolverSudoku test12 "anchura")
+(resolverSudoku test12 "profundidad")
+
+(resolverSudoku test13 "anchura")
+(resolverSudoku test13 "profundidad")
+
+(resolverSudoku test14 "anchura")
+(resolverSudoku test14 "profundidad")
+
+(resolverSudoku test15 "anchura")
+(resolverSudoku test15 "profundidad")
+
+(resolverSudoku test16 "anchura")
+(resolverSudoku test16 "profundidad")
+
+(resolverSudoku test17 "anchura")
+(resolverSudoku test17 "profundidad")
+
+(resolverSudoku test18 "anchura")
+(resolverSudoku test18 "profundidad")
+
+(resolverSudoku test19 "anchura")
+(resolverSudoku test19 "profundidad")
+
+(resolverSudoku test20 "anchura")
+(resolverSudoku test20 "profundidad")
+

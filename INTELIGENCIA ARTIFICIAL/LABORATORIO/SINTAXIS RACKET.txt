@@ -1,0 +1,105 @@
+#|
+ comentamos un trozo
+ de codigo
+|#
+;define una variable
+(define x 1)
+
+;funcion que hace la media
+(define (media a b)
+  (/(+ a b)2))
+(media 10 0)
+
+;podemos definir #t true y #f false
+;operador or, and, not, nand y xor nos devuelve el resultado (or _ _ _) (and _ _ _)
+;podemos usar ifs (if #t/#f a b) si es true devuelve el primero a si no el segundo b
+tambien en un if podemos dar procedimientos a parametros
+	((if boolean + -) a b)
+;funcion (exact? numero) devuelve si es un int
+;funcion number? devuelve si es un numero
+;funcion char? devuelve si es un char
+;funcion string? devuelve si es un string
+;funcion boolean? devuelve si es un boolean
+;funcion (equal? a b) devuelve #t o #f segun si son iguales
+;funcion (cond
+#|(define (queSoy x)
+  (cond
+    [(condicion) return]
+    [(condicion) return]
+    [else return]))
+|#
+
+
+;funcion (exp a) devuelve el numero de euler elevado a z
+;funcion (expt a b) exponente de a^b
+;funcion (log a b) logaritmo de a en base b
+;para comparar (= a b) (>= a b) (< a b)...
+;para imprimir una cadena ponemos (display "cadena")
+;comillas->(display "cadena \"hola\"") salto linea->(display "Hola\nQue tal")
+;pares de valores con (cons a b) o '(a . b)
+;(car pardevalores) primer elemento y (cdr pardevalores) segundo elemento
+;numero infinitos +inf.0 y -inf.0
+;para poner un caracter #\a
+;para poner un caracter ponemos su codigo de UNICODE #\ucodigo
+
+(write elem) //printea el elemento
+(newline) //hace salto de linea
+
+
+***************  LISTAS Y DEMAS *****************
+**definir lista
+(define lista (list 1 2 3 4 5 6 7 8)) //definimos una lista
+
+**acceder elementos
+(car/first lista) (cdr/rest lista) //acceder al primero o al resto de la lista
+(first/second...tenth lista) (last lista) //obtener la posicion dada de una lista
+(card/carddr/cardddr lista) //acceder al primero de la lista que salga con los cdr
+(cdr/cddr/cdddr/cddddr lista) //retorna una lista a partir del elemento del cdr
+(list-ref lista i) //retorna el numero en la posicion i
+
+**operaciones
+(append lista1 lista2) //retorna una lista mas otra
+(reverse lista) //invierte una lista
+(list-tail lista elem) //retorna la lista quitando elem elementos
+(member elemento lista) //retorna #f si no esta y retorna una lista con car elemento si esta
+(foldr operacion numero/null elem1...) //recorre los elementos de la lista en orden y hace operacion
+(foldl operacion numero/null elem1...) //recorre los elementos de la lista al reves y hace operacion
+
+**otro
+(map func lista) //se aplica a cada elemento de la lista func ej(map add1 lista)
+		 // tiene que tener el mismo numero de listas que parametros tenga una funcion
+
+(andmap func<BOOL> lista lista1...) //retorna un bool el cual sera #t si todos los retornos de func son #t
+(ormap func<BOOL> lista lista1...) //retorna un bool el cual es #t si al menos un retorno de func es #t
+(filter func<BOOL> lista lista1...) //retorna una lista de elementos de una lista los cuales cumplan la func boolena
+(length lista) //devuelve la longitud de una lista
+(apply func/operador lista) //hace con la lista lo que ponga en el operador/funcion
+
+(define (nombreFunc . lista)) //todos los parametros que se le metan haran la funcion de lista
+//para poder usar la anterior funcion como una lista solo tenemos que poner 
+   (apply nombreFunc lista)
+
+
+******************* FUNCIONES LAMBDA ***********************
+((lambda (parametros) (cuerpo)) valorparametros) //hace con los parametros lo que hay en el cuerpo SOLO UNA COSA
+
+
+******************* BUCLES FOR ***********************
+**for normal
+(for([i numero]) (hace algo)) //i es un numero entre 0 y numero-1
+(for([i lista]) (hace algo)) //coge cada elemento de la lista
+// dentro del for puede ir lo siguiente
+	[i (in range numero)]//valores entre 0 y numero-1
+
+**for condicional
+(for/or ([numero lista]) (number? numero)) //retorna si al menos un elemento cumple
+(for/and ([numero lista]) (number? numero)) //retorna si todos los elementos cumplen
+
+**for paralelo y anidado
+(for ([n1 lista][n2 lista1]) (printf "~a ~a" n1 n2 )) //por cada vuelta coge los dos valores a la vez
+(for* ([n1 lista][n2 lista1]) (printf "~a ~a" n1 n2)) //for dentro de otro for
+
+
+****************** LET Y LET* *******************
+(let [(id expr) (id2 expr2)...] (cuerpo)) //declaramos variables de ambito local
+(let* [(id expr) (id2 (+ id 2))...] (cuerpo)) //declaramos variables de ambito local y podemos dentro de la misma declaracion usar la anterior

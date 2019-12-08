@@ -1,0 +1,61 @@
+;;;; ejercicio 1.3
+(define (potencia x y)
+  (expt x y))
+(potencia 3 0.5) 
+
+(define (logaritmo n1 n2)
+  (log n1 n2))
+(log 3 10)
+(log 2 10)
+
+;;; ejercicio 1.4
+(define (angulo coseno)
+  (* (acos coseno) 57.2958))
+(angulo 0.856)
+
+;;;ejercicio 5
+(define (numeroE numero)
+  (exp numero))
+(numeroE 1)
+
+;;;ejercicio 7
+(define (comprobar x y)
+  (and x y))
+(comprobar (or(< 3 3) (> 2 0)) (= 3 3))
+
+;;;ejercicio 8
+(define (nota x)
+  (cond
+    ((< x 5) "suspenso")
+    ((and (>= x 5) (< x 6) "aprobado"))
+    ((and (>= x 6) (< x 7) "bien"))
+    ((and (>= x 7) (< x 9) "notable"))
+    (else "sobresaliente")))
+    
+(nota 8.9999)
+(nota 5.4)
+(nota 7.8)
+(nota 10)
+
+;;;ejercicio 9
+(define (random-choice)
+  ( + 1 (random 6)))
+(random-choice)
+
+;;;ejercicio 11
+(define (positivo x)
+  (> x 0))
+(positivo -1)
+  
+;;;ejercicio 13
+(define (posoneg x)
+  (cond
+    ((< x 0) "Numero negativo")
+  (else "Numero positivo")))
+(posoneg -2)
+
+
+;ejercicio 14
+(define(polinomio c1 c2 c3 c4 x)
+  (+ (* x x x c1) (* x x c2) (* x c3) c4))
+(polinomio 1 2 3 4 1)

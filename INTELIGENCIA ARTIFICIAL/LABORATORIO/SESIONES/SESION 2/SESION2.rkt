@@ -1,0 +1,20 @@
+#lang racket
+
+(define (anadirElem a lista)
+  ((append lista a)))
+
+(append (list 1 2 3 4) 69)
+
+(define (printear n) n )
+(define (encontrar lista)
+  (write (second lista))
+  (newline)
+  (write lista)
+  (newline)
+  (write (car(reverse lista)))
+  (newline)
+  (write (second(reverse lista))
+))
+
+(define lista (list 1 2 3 4))
+(encontrar lista)
