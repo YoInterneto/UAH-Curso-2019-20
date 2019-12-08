@@ -1,0 +1,84 @@
+grammar snake;
+
+prog: ( (funcion|cuerpo_funcion|llamadafuncion|asignacion|declaracion|control|include) NEWLINE?)* ;
+
+//FUNCIONES
+funcion : pr_funcion nombre_funcion parametros tipo_devolucion ;
+llamadafuncion : nombre_funcion parametros basura ;
+declaracion : pr_tipo nombre_variable ASIGNAR expr basura ; //la primera vez que instanciamos una variable
+asignacion: nombre_variable ASIGNAR expr basura ; //asignar un valor a una variable
+bloque : pr_bloque ;
+control: pr_control parametros ; 
+include: pr_include nombre_libreria basura ;
+
+//PALABRAS RESERVADAS
+FUNCTION: 'function';
+INCLUDE: 'include' ;
+WHILE: 'while' ;
+IF: 'if' ;
+ELSE: 'else' ;
+BEGIN: 'begin' ;
+END: 'end' ;
+TIPO: ('numero'|'cadena'|'void') ;
+
+//EXPRESIONES
+arg: (TIPO ID((','|', ')TIPO ID)*)? ;
+expr: expr ('*'|'/') expr
+    | expr ('+' | '-') expr
+    | expr ('=='|'!='|'<'|'>'|'<='|'>=') expr
+    | expr (','|', ') expr
+    | ID PI expr PD
+    | ID PI ((INT|ID|STRING|FLOAT)((','|', ')(INT|ID|STRING|FLOAT))*)? PD NEWLINE?
+    | INT NEWLINE?              //
+    | STRING NEWLINE?           // Los NEWLINE? son para el caso en el cual haya varias lineas para refernciar   
+    | FLOAT NEWLINE?            // a parametros, asignaciones de variables...
+    | ID NEWLINE?               //            
+    ;
+
+cuerpo_funcion: pr_bloque NEWLINE* ((llamadafuncion|asignacion|control|declaracion)NEWLINE*)* pr_bloque ;
+
+pr_funcion: FUNCTION ;
+pr_tipo: TIPO ;
+pr_bloque: BEGIN | END ;
+pr_control: IF | ELSE | WHILE ;
+pr_include: INCLUDE ;
+
+nombre_funcion: ID ;
+nombre_variable: ID ;
+nombre_libreria: ID ;
+
+tipo_devolucion: basura pr_tipo ;
+
+basura: DOBLEPUNTO | FINAL | NEWLINE;
+
+parametros: PI expr PD | PI arg PD;
+
+
+
+//IDENTIFICADORES
+ID: ID_LETRA(ID_LETRA|DIGITO)*;
+fragment ID_LETRA: [a-zA-Z];
+fragment DIGITO: [0-9];
+
+//VARIABLES
+INT: DIGITO+;
+FLOAT: DIGITO+ '.' DIGITO*
+        | '.' DIGITO+
+        ;
+STRING: '"' .*? '"';
+
+//COMENTARIOS
+COMENTARIO_LINEA: ('//' .*? '\n') -> skip ;
+COMENTARIO_BLOQUE: ('/*' .*? '*/' NEWLINE) -> skip ;
+
+//SALTO DE LINEA
+NEWLINE: [\r\n]+;
+
+//CARACTERES ESPECIALES
+PI: '(' ;
+PD: ')' ;
+FINAL: ';' ;
+ASIGNAR: ':=' ;
+DOBLEPUNTO: ':';
+WS: ' '+ -> skip;
+TAB: '\t'+ -> skip;

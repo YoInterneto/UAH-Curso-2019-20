@@ -1,0 +1,60 @@
+generar fichero -> antlr .\Expr.g4
+compilar -> javac *.java
+ejecutar codigo -> grun Expr prog -gui -tokens 
+
+---- GRAMATICA DE ANTLR ----
+
+crear una regla -> nombreregla : ER;
+
+
+---- PATRONES DEL LENGUAJE ---
+*Tipos de patrones*
+
+1. Patron secuencia (siguen el mismo orden que las DR, no se altera)
+DR: x y w z ; 
+DR: '[' INT ']' ;
+
+2. Patron secuencia con terminador (lo mismo de antes pero con un simbolo final)
+DR: x y z ';' ;
+DR: (x y z ';')* ; (suele ponerse asi)
+
+3. Patron secuencia separadores (de secuencia pero con simbolos intermedios)
+por ejemplo -> 3 , 4 , 5 , 6 , 7
+DR: expr (','expr)* ;
+DR: expr (','expr)? ;
+
+4. Patron eleccion (una DR puede ser diferente segun el contexto)
+se separan con |, si es corto en una linea si es largo en varias
+DR:	expr ('*'|'/') expr
+    |	expr ('+'|'-') expr
+    |   expr ('<'|'>'|'=='|'!=') expr
+    |	INT
+    |	'(' expr ')'
+    |   OPERACION '(' (expr(','expr)*)? ')'
+    |   VARIABLE
+    ;
+DR: cos | sen | tan
+
+5. Patron dependecia de tokens (la DR necesita algo si o si para aparecer)
+DR: '(' expr ')' ;
+
+6. Patron de frase/expresion anidada 
+-  recursividad directa  -
+DR: DR | 'b' ; -> b bbb bbbbbb
+hay dos tipos left y right 
+DRL: DRL 'c' | 'b';
+DRR: 'c' | DRR;
+DRRL: DRLL 'c' | 'd' | 'a' DRRL;
+-  recursividad indirecta  - (antlr no puede resolverlo no sabe cual va antes)
+DRI: expo | 'd';
+expo: DRI 'c';
+
+
+PARA HACER UNA GRAMATICA NO DEBE HABER SIMBOLOS TERMINALES DENTRO DE ESTA ES
+DECIR DENTRO DEL PARSER
+
+fragment sirve para no usar tokens, si no que lo que hace es generar dentro de un
+token terminal una combinacion de simbolos terminales
+
+operador .* quiere decir que se recogeran todo lo que entre independientemente 
+del tipo, se usa para no tener que defir DR
